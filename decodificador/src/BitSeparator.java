@@ -1,4 +1,5 @@
 public class BitSeparator {
+    //extrai uma quantidade de bits comecando em uma determinada posição
     public int extract(int instruction, int start, int length) {
         int mask = (1 << length) - 1;
 
@@ -22,7 +23,7 @@ public class BitSeparator {
     }
 
     public int rs2(int instruction) {
-        return extract(instruction, 10, 5);
+        return extract(instruction, 20, 5);
     }
 
     public int funct7(int instruction) {
