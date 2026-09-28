@@ -90,10 +90,10 @@ public class FormatDetector {
                 return "jal";
 
             default:
-             return null;
+                return null;
         }
     }
-    
+
     //tipo R: add, sub, sll, slt, sltu, xor, srl, sra, or, and 
     // opcode é sempre o mesmo (0110011); o que muda é funct3 e, em alguns
     private String mnemonicoTipoR(int funct3, int funct7) {
@@ -101,7 +101,7 @@ public class FormatDetector {
             case 0b000:
                 if (funct7 == 0b0000000) return "add";
                 if (funct7 == 0b0100000) return "sub";
-             return null;
+                return null;
 
             case 0b001:
                 return (funct7 == 0b0000000) ? "sll" : null;
@@ -118,7 +118,7 @@ public class FormatDetector {
             case 0b101:
                 if (funct7 == 0b0000000) return "srl";
                 if (funct7 == 0b0100000) return "sra";
-             return null;
+                return null;
 
             case 0b110:
                 return (funct7 == 0b0000000) ? "or" : null;
@@ -127,10 +127,10 @@ public class FormatDetector {
                 return (funct7 == 0b0000000) ? "and" : null;
 
             default:
-             return null;
+                return null;
         }
     }
-    
+
     //tipo I aritmético/lógico: addi, slti, sltiu, xori, ori, andi, slli, srli, srai
     private String mnemonicoTipoIAritmetico(int funct3, int funct7) {
         switch (funct3) {
@@ -147,13 +147,13 @@ public class FormatDetector {
             case 0b101:
                 if (funct7 == 0b0000000) return "srli";
                 if (funct7 == 0b0100000) return "srai";
-             return null;
+                return null;
 
             default:
-             return null;
+                return null;
         }
     }
-    
+
     //tipo I de leitura de memória: lb, lh, lw, lbu, lhu 
     private String mnemonicoTipoILoad(int funct3) {
         switch (funct3) {
@@ -196,6 +196,3 @@ public class FormatDetector {
         return mnemonico(instrucao) != null;
     }
 }
- 
-    
-

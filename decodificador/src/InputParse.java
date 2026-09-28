@@ -62,7 +62,7 @@ public class InputParse {
 
         List<Instrucaolida> instrucoes = new ArrayList<>();
 
-        int endrecoAtual =+ 4;
+        int endrecoAtual = enderecoBase;
 
         for(int i = 0; i < todasAsLinhas.size(); i++){
             String linha = todasAsLinhas.get(i);
@@ -76,7 +76,7 @@ public class InputParse {
                 int valor = parse(linha);
                 instrucoes.add(new Instrucaolida(endrecoAtual, valor, linha.trim()));
                 //cada instrucao ocupa 4 bytes, o pc da proxima instrucao é = enderecoAtual + 4
-                endrecoAtual = enderecoBase + 4;
+                endrecoAtual += 4;
             } catch (NumberFormatException erro){
                 System.err.println("a linha " + (i + 1) + "(\"" + linha.trim() + "\") " + "não pôde ser convertida em número e foi ignorada.");
             }

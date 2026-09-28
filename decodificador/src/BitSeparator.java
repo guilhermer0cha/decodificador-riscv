@@ -31,7 +31,7 @@ public class BitSeparator {
     }
 
     //(parte do R3)
-    
+
     public int estenderSinal(int valor, int quantidadeDeBits) {
         int deslocamento = 32 - quantidadeDeBits;
         return (valor << deslocamento) >> deslocamento;

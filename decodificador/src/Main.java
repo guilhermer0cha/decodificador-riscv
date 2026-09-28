@@ -1,104 +1,28 @@
+import java.io.IOException;
+import java.util.List;
+
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         InputParse parser = new InputParse();
         BitSeparator extractor = new BitSeparator();
+        FormatDetector detector = new FormatDetector(extractor);
 
-        //tirei os exemplos do enunciado do trabalho(um de cada formato)
-        //(R, I, S e B) pra testar se a extração bate
-        String[] exemplos = {
-          "0x00500413", //addi s0, zero, 5 (tipo I)
-          "0x00C58633", //add a2, a1, a2 (tipo R)
-          "0x0064A423", //sw t1, 8(s1) (tipo S)
-          "0xFE628CE3", //beq t0, t1, -8 (tipo B)
-          "0x000002B7", // lui x5, 0 (tipo U
-          "0x00000297", // auipc x5, 0 (tipo U
-          "0x0000006F"  // jal x0, 0 (tipo J
-        };
+        // caminho e endereco-base podem ser informados pela linha de comando
+        String caminho = args.length > 0 ? args[0] : "memoria.txt";
+        int enderecoBase = args.length > 1 ? Integer.decode(args[1]) : 0;
 
-        for(String textoInstrucao : exemplos){
-            int instrucao = parser.parse(textoInstrucao);
-            FormatDetector detector = new FormatDetector(extractor);
-            String formato = detector.formato(instrucao);
-            String mnemonico = detector.mnemonico(instrucao);
+        try {
+            List<InputParse.Instrucaolida> instrucoes =
+                    parser.lerArquivo(caminho, enderecoBase);
 
-            System.out.println("------------------------------------------------");
-            System.out.println("original: " + textoInstrucao);
-            System.out.println("binário: " + parser.toBinary(instrucao));
+            System.out.println("=============== SAÍDA ===============");
 
-            System.out.println("Opcode: "
-                    + parser.toBinary(extractor.opcode(instrucao))
-                    + " (decimal "
-                    + extractor.opcode(instrucao)
-                    + ")");
-
-            System.out.println("formato: " + formato);
-            System.out.println("Mnemônico: " + mnemonico);
-            System.out.println("válida: " + detector.isValida(instrucao));
-
-            System.out.println("---campos---");
-
-            switch (formato) {
-
-                case "R":
-                    System.out.println("rd = " + extractor.rd(instrucao));
-                    System.out.println("rs1 = " + extractor.rs1(instrucao));
-                    System.out.println("rs2 = " + extractor.rs2(instrucao));
-                    System.out.println("funct3 = " + extractor.funct3(instrucao));
-                    System.out.println("funct7 = " + extractor.funct7(instrucao));
-                    break;
-
-                case "I":
-                    System.out.println("rd = " + extractor.rd(instrucao));
-                    System.out.println("rs1 = " + extractor.rs1(instrucao));
-                    System.out.println("funct3 = " + extractor.funct3(instrucao));
-                    break;
-
-                case "S":
-                    System.out.println("rs1 = " + extractor.rs1(instrucao));
-                    System.out.println("rs2 = " + extractor.rs2(instrucao));
-                    System.out.println("funct3 = " + extractor.funct3(instrucao));
-                    break;
-
-                case "B":
-                    System.out.println("rs1 = " + extractor.rs1(instrucao));
-                    System.out.println("rs2 = " + extractor.rs2(instrucao));
-                    System.out.println("funct3 = " + extractor.funct3(instrucao));
-                    break;
-
-                case "U":
-                    System.out.println("rd = " + extractor.rd(instrucao));
-                    break;
-
-                case "J":
-                    System.out.println("rd = " + extractor.rd(instrucao));
-                    break;
+            for (InputParse.Instrucaolida instrucao : instrucoes) {
+                Output.imprimirInstrucao(instrucao, extractor, detector);
             }
 
-            System.out.println("---imediatos---");
-
-            switch (formato) {
-
-                case "I":
-                    System.out.println("immI = " + extractor.immI(instrucao));
-                    break;
-
-                case "S":
-                    System.out.println("immS = " + extractor.immS(instrucao));
-                    break;
-
-                case "B":
-                    System.out.println("immB = " + extractor.immB(instrucao));
-                    break;
-
-                case "U":
-                    System.out.println("immU = " + extractor.immU(instrucao));
-                    break;
-
-                case "J":
-                    System.out.println("immJ = " + extractor.immJ(instrucao));
-                    break;
-            }
-            System.out.println("------------------------------------------------");
+        } catch (IOException erro) {
+            System.err.println("não foi possível ler o arquivo: " + erro.getMessage());
         }
     }
 }
