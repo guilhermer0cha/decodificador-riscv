@@ -1,0 +1,16 @@
+# addi s3, zero, 5
+0x00500993
+# lw t0, 0(a0)
+0x00052283
+# add t1, t0, s3
+0x01328333
+# sw t1, 0(a0)
+0x00652023
+# addi t2, t2, -1
+0xFFF38393
+# bne t2, zero, 0x00400004
+0xFE0398E3
+# addi a0, a0, 4
+0x00450513
+# add t3, a0, a0
+0x00A50E33

@@ -1,0 +1,94 @@
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/*
+ *fluxo desta etapa:
+ *1) ler o arquivo e decodificar com as classes da M1
+ *2) GUARDAR cada instrução como um objeto Instrucao numa lista
+ *3) detectar e mostrar os conflitos de dados e de controle
+ */
+public class MainM2 {
+
+    public static void main(String[] args) {
+        String caminho = args.length > 0 ? args[0] : "testes/teste3.txt";
+        int enderecoBase = args.length > 1 ? Integer.decode(args[1]) : 0x00400000;
+
+        //as peças da M1, reaproveitadas como estão
+        InputParse parser = new InputParse();
+        BitSeparator extrator = new BitSeparator();
+        FormatDetector detector = new FormatDetector(extrator);
+
+        try {
+            //1) lê e converte as linhas em Instrucaolida (endereço + valor)
+            List<InputParse.Instrucaolida> lidas = parser.lerArquivo(caminho, enderecoBase);
+
+            //2) transforma cada uma em Instrucao: é aqui que o programa "guarda"
+            //as informações (o que cada instrução lê e escreve)
+            List<Instrucao> programa = new ArrayList<>();
+            for (InputParse.Instrucaolida lida : lidas) {
+                programa.add(Instrucao.decodificar(lida, extrator, detector));
+            }
+
+            imprimirPrograma(programa);
+
+            //3) detecção
+            DetectorConflitos detector2 = new DetectorConflitos(programa);
+            imprimirConflitosDeDados(detector2);
+            imprimirConflitosDeControle(detector2, programa);
+
+        } catch (IOException erro) {
+            System.err.println("não foi possível ler o arquivo: " + erro.getMessage());
+        }
+    }
+
+    private static void imprimirPrograma(List<Instrucao> programa) {
+        System.out.println("PROGRAMA ORIGINAL (" + programa.size() + " instrucoes)");
+        for (Instrucao inst : programa) {
+            System.out.println(String.format(" 0x%08X  0x%08X  %s", inst.endereco, inst.valor, inst.assembly));
+        }
+        System.out.println();
+    }
+
+    private static void imprimirConflitosDeDados(DetectorConflitos det) {
+        System.out.println("CONFLITOS DE DADOS");
+        List<ConflitoDados> conflitos = det.detectarConflitosDeDados();
+        if (conflitos.isEmpty()) {
+            System.out.println(" nenhum");
+        }
+        for (ConflitoDados c : conflitos) {
+            System.out.println(" " + c);
+        }
+        System.out.println();
+    }
+
+    private static void imprimirConflitosDeControle(DetectorConflitos det, List<Instrucao> programa) {
+        System.out.println("CONFLITOS DE CONTROLE");
+        List<ConflitoControle> desvios = det.detectarSlotsDeAtraso();
+        if (desvios.isEmpty()) {
+            System.out.println(" nenhum desvio");
+        }
+        for (ConflitoControle c : desvios) {
+            System.out.println(" " + c);
+        }
+
+        System.out.println();
+        System.out.println("BLOCOS BASICOS");
+        for (BlocoBasico b : det.identificarBlocos()) {
+            Instrucao primeira = programa.get(b.indiceInicio);
+            Instrucao ultima = programa.get(b.indiceFim);
+            System.out.println(String.format(" bloco %d: 0x%08X ate 0x%08X (%d instrucoes)",
+                    b.numero, primeira.endereco, ultima.endereco, b.tamanho()));
+        }
+
+        System.out.println();
+        System.out.println("CONFLITOS DE DADOS ATRAVES DO DESVIO (quando o desvio e tomado)");
+        List<ConflitoDados> atravessam = det.detectarConflitosAtravesDosDesvios();
+        if (atravessam.isEmpty()) {
+            System.out.println(" nenhum");
+        }
+        for (ConflitoDados c : atravessam) {
+            System.out.println(" " + c);
+        }
+    }
+}

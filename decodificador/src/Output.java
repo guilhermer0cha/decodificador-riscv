@@ -129,7 +129,7 @@ public class Output {
         }
     }
 
-    private static String montarAssembly(int endereco,
+    static String montarAssembly(int endereco,
                                          int instrucao,
                                          String formato,
                                          String mnemonico,
@@ -245,7 +245,7 @@ public class Output {
         return null;
     }
 
-    private static String nomeABI(int registrador) {
+    static String nomeABI(int registrador) {
         switch (registrador) {
             case 0:  return "zero";
             case 1:  return "ra";

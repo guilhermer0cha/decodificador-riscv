@@ -1,0 +1,4 @@
+#invalido
+0x00500993
+0xFFFFFFFF
+0x00B50633
