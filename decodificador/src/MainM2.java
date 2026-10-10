@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +13,7 @@ import java.util.List;
 public class MainM2 {
 
     public static void main(String[] args) {
-        String caminho = args.length > 0 ? args[0] : "testes/teste3.txt";
+        String caminho = args.length > 0 ? args[0] : "testes/teste1.txt";
         int enderecoBase = args.length > 1 ? Integer.decode(args[1]) : 0x00400000;
 
         //as peças da M1, reaproveitadas como estão
@@ -32,14 +34,55 @@ public class MainM2 {
 
             imprimirPrograma(programa);
 
-            //3) detecção
+            //3) detecção (R1 e R2)
             DetectorConflitos detector2 = new DetectorConflitos(programa);
             imprimirConflitosDeDados(detector2);
             imprimirConflitosDeControle(detector2, programa);
+            System.out.println();
+
+            Corretor corretor = new Corretor(programa);
+            Saida saida = new Saida(extrator, detector);
+            List<ResultadoCorrecao> resultados = new ArrayList<>();
+
+            ResultadoCorrecao soNops = corretor.corrigirSoComNops();
+            saida.imprimirListagem(soNops);
+            gravarEVerificar(saida, soNops, "somente_nops", caminho, extrator, detector, enderecoBase);
+            resultados.add(soNops);
+
+            //5) relatório de custo (R8)
+            Saida.imprimirCusto(programa.size(), resultados);
 
         } catch (IOException erro) {
             System.err.println("não foi possível ler o arquivo: " + erro.getMessage());
         }
+    }
+
+    /*
+     * grava os 2 arquivos da técnica (programa e listagem) e confere a saída: lê o arquivo de volta
+     * com as classes da M1 e roda os detectores; o resultado tem que ter zero conflitos de dados.
+     */
+    private static void gravarEVerificar(Saida saida, ResultadoCorrecao r, String sufixo, String caminhoEntrada,
+                                         BitSeparator extrator, FormatDetector detector, int base) throws IOException {
+        Path entrada = Path.of(caminhoEntrada);
+        String nome = entrada.getFileName().toString().replaceFirst("\\.[^.]*$", "");
+        Path pasta = Path.of("saida");
+        Files.createDirectories(pasta);
+        Path arqPrograma = pasta.resolve(nome + "_" + sufixo + ".txt");
+        Path arqListagem = pasta.resolve(nome + "_" + sufixo + "_listagem.txt");
+        saida.escreverPrograma(arqPrograma, r);
+        saida.escreverListagem(arqListagem, r);
+
+        List<Instrucao> relido = new ArrayList<>();
+        for (InputParse.Instrucaolida l : new InputParse().lerArquivo(arqPrograma.toString(), base)) {
+            relido.add(Instrucao.decodificar(l, extrator, detector));
+        }
+        DetectorConflitos det = new DetectorConflitos(relido);
+        int dados = det.detectarConflitosDeDados().size() + det.detectarConflitosAtravesDosDesvios().size();
+        boolean mesmoTamanho = relido.size() == r.totalInstrucoes();
+        System.out.println("arquivos: " + arqPrograma + " e " + arqListagem);
+        System.out.println("releitura pela M1: " + relido.size() + " instrucoes, conflitos de dados restantes: " + dados
+                + (dados == 0 && mesmoTamanho ? "  [OK]" : "  [FALHOU]"));
+        System.out.println();
     }
 
     private static void imprimirPrograma(List<Instrucao> programa) {
