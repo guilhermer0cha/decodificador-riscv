@@ -1,0 +1,35 @@
+# programa corrigido - tecnica: somente nops
+# addi s3, zero, 5
+0x00500993
+# lw t0, 0(a0)
+0x00052283
+# nop
+0x00000013
+# nop
+0x00000013
+# add t1, t0, s3
+0x01328333
+# nop
+0x00000013
+# nop
+0x00000013
+# sw t1, 0(a0)
+0x00652023
+# addi t2, t2, -1
+0xFFF38393
+# nop
+0x00000013
+# nop
+0x00000013
+# bne t2, zero, 0x00400004
+0xFC039CE3
+# nop
+0x00000013
+# addi a0, a0, 4
+0x00450513
+# nop
+0x00000013
+# nop
+0x00000013
+# add t3, a0, a0
+0x00A50E33

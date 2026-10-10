@@ -1,0 +1,19 @@
+LISTAGEM - somente nops
+endereco     codigo      instrucao
+0x00400000  0x00500993  addi s3, zero, 5
+0x00400004  0x00052283  lw t0, 0(a0)
+0x00400008  0x00000013  nop                          << NOP inserido (conflito de dados)
+0x0040000C  0x00000013  nop                          << NOP inserido (conflito de dados)
+0x00400010  0x01328333  add t1, t0, s3
+0x00400014  0x00000013  nop                          << NOP inserido (conflito de dados)
+0x00400018  0x00000013  nop                          << NOP inserido (conflito de dados)
+0x0040001C  0x00652023  sw t1, 0(a0)
+0x00400020  0xFFF38393  addi t2, t2, -1
+0x00400024  0x00000013  nop                          << NOP inserido (conflito de dados)
+0x00400028  0x00000013  nop                          << NOP inserido (conflito de dados)
+0x0040002C  0xFC039CE3  bne t2, zero, 0x00400004
+0x00400030  0x00000013  nop                          << NOP inserido (slot de atraso)
+0x00400034  0x00450513  addi a0, a0, 4
+0x00400038  0x00000013  nop                          << NOP inserido (conflito de dados)
+0x0040003C  0x00000013  nop                          << NOP inserido (conflito de dados)
+0x00400040  0x00A50E33  add t3, a0, a0
