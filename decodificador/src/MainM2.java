@@ -49,6 +49,12 @@ public class MainM2 {
             gravarEVerificar(saida, soNops, "somente_nops", caminho, extrator, detector, enderecoBase);
             resultados.add(soNops);
 
+            Reordenador reordenador = new Reordenador(programa, detector2.identificarBlocos());
+            ResultadoCorrecao comReordenacao = reordenador.reordenar(corretor);
+            saida.imprimirListagem(comReordenacao);
+            gravarEVerificar(saida, comReordenacao, "reordenacao", caminho, extrator, detector, enderecoBase);
+            resultados.add(comReordenacao);
+
             //5) relatório de custo (R8)
             Saida.imprimirCusto(programa.size(), resultados);
 
